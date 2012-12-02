@@ -1,0 +1,86 @@
+Application API:
+
+* The application API gives you full controll
+
+The application front end consists of two coniguration pages and one view page.
+
+http://101.147.93.1/cgi-bin/luci/apps - The apps front end where a user can view applications
+http://101.147.93.1/cgi-bin/luci/apps/add - A form that allows a admin to add an application 
+http://101.147.93.1/cgi-bin/luci/apps/list - A form that allows the admin to modify existing applications
+
+* Application Files
+
+** Main Files
+The Application API consists of a main viewer, a controller, a submission page, three three app viewer templates and two app viewer formatting templates.
+
+usr/lib/lua/luci/view/apps/apps_view.htm
+usr/lib/lua/luci/controller/apps/apps_controller.htm
+usr/lib/lua/luci/view/apps/add_view.htm
+
+usr/lib/lua/luci/view/theme/YOUR THEME/categories.htm
+usr/lib/lua/luci/view/theme/YOUR THEME/apps.htm
+usr/lib/lua/luci/view/theme/YOUR THEME/banner.htm
+usr/lib/lua/luci/view/theme/YOUR THEME/apps.css
+usr/lib/lua/luci/view/theme/YOUR THEME/apps.js
+
+** Symbolic Links
+It also has two simbolic links in the theme media directory that point to apps.css and apps.js respectively.
+
+/www/luci-static/YOUR THEME/apps.css
+/www/luci-static/YOUR THEME/apps.js
+
+** UCI 
+The applications are parsed from a UCI file called applications
+/etc/config/applications
+
+* Back end
+** The controller 
+The Controller has two functions load_apps and action_add
+
+*** load_apps
+load_apps parses through the UCI file to populate a "categories" list to send to the apps_view.htm file. 
+
+Before adding an application to the categories list the controller checks to see that the ip address of the service is accepting traffic on the specified port. 
+
+Once all the applications are bundled under their respective types (multi-typed applications are duplicated under each category) the apps_view is rendered and passed the categories variable. 
+
+*** action_add
+action_add accepts the form values from the add_view page. After adding the required and optional sections it assigns each application a unique user id consiting of 9 bits of randomness and the name of the app which it offers as a variable and as the name of the UCI application. There is an unused option  for a fingerprint value for future use with signed applications.
+
+
+* Front end
+** add_view
+The app_view file is merely a form that allows a admin to easily add applications to the application system. It currently is not very pretty at all.
+** app_view
+The app view is the main application front end from a user standpoint. It is controlled by the five theme files. 
+
+The scaffolding of the app_view is as such. 
+
+Header Theme
+Banner Theme
+<div class="types">
+    <div class="type" id="<%=catType%>">
+    Categories Theme
+        <div class="apps" id="<%=catType%>Apps">
+            <div class="app" id="<%=uuid%>">
+            Apps Theme
+            </div>
+        </div>
+    </div<
+</div>
+Footer Theme
+
+
+Each application category will contain the apps div and the apps that fall under it within its div. 
+
+The syntax <%=value%> will replace be replaced with the corresponding value  of that variable. These values can be used in the categories and apps themes. The available values are:
+
+catType : The category of application that is currently being parsed
+name : The name of the currently parsed application
+nick : The nick-name of the current application
+ipaddr :the IP address of the current application
+icon : The link to the icon used by the application
+description : A description that describes the current application
+uuid : The router specific UUID of the application 
+port : The port that the application will accept traffic on
+fingerprint : the application/server specific fingerprint used for application identification across nodes.
