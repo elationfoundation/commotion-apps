@@ -24,8 +24,7 @@ require "luci.http"
 require "luci.sys"
 function index()
     entry({"apps"}, call("load_apps"), "Local Applications", 20).dependent=false
-        e = node("apps")
-		e.target = call("action_add")
+	e.target = call("action_add")
     entry({"apps", "list"}, cbi("commotion/apps_cbi")).dependent=false
     entry({"apps", "add"}, template("commotion/apps_add")).dependent=false
 	entry({"apps", "add"}).target = call("action_add")
@@ -46,23 +45,23 @@ uci:foreach("applications", "application",
    end end end)
    
 for _, r in pairs(apps) do
-   if r.type then
+	if r.type then
 	  	 for _, t in pairs(r.type) do
 		  	if categories[t] then
                 appName = r.name
 				categories[t][appName] = r
-		else
+			else
 		  	    categories[t] = {}
 				appName = r.name
 				categories[t][appName] = r
 			end
-		end
-	 else appName = r.name
+		 end
+	else appName = r.name
 	 	  if categories['misc'] then
 		  	 categories['misc'][appName] = r
 		  else
 			categories['misc'] = {}
-				categories['misc'][appName] = r
+			categories['misc'][appName] = r
 		  end
 	 end
 end
