@@ -81,7 +81,7 @@ local values = {
 	  ['icon'] =  luci.http.formvalue("source"),
 	  ['nick'] =  luci.http.formvalue("appNick"),
 	  ['description'] =  luci.http.formvalue("description"),
-	  ['uuid'] = UUID
+	  ['fingerprint'] = luci.http.formvalue("fingerprint"),
 }
 
 if  luci.http.formvalue("port") then
