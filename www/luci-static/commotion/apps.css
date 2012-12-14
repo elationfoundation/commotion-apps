@@ -1,0 +1,13 @@
+.apps {
+display:none;
+outline-width:2px;
+outline-color:#ff6699;
+outline-style:dashed;	
+}
+
+.app {
+height:auto;
+padding:10px;
+}
+
+a, a:focus { outline: 0; }
