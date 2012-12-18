@@ -9,3 +9,5 @@ outline-style:dashed;
 height:auto;
 padding:10px;
 }
+
+a, a:focus { outline: 0; }
