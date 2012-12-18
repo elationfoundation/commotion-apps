@@ -24,14 +24,17 @@ require "luci.http"
 require "luci.sys"
 function index()
     entry({"apps"}, call("load_apps"), "Local Applications", 20).dependent=false
-	e.target = call("action_add")
+    entry({"admin","commotion","apps"}, call("admin_load_apps"), "Local Applications", 50).dependent=false
     entry({"apps", "list"}, cbi("commotion/apps_cbi")).dependent=false
     entry({"apps", "add"}, template("commotion/apps_add")).dependent=false
-	entry({"apps", "add"}).target = call("action_add")
-	end
+    entry({"apps", "add"}).target = call("action_add")
+end
 
+function admin_load_apps()
+	load_apps({true})
+end
 
-function load_apps()
+function load_apps(admin_vars)
 
 local name, nick, ip, port, apps, app,  description, i, r
 local uci = luci.model.uci.cursor()
@@ -40,32 +43,38 @@ local apps = {}
 uci:foreach("applications", "application",
    function(s)
        if s.name then
-	       if  luci.sys.call("nc -z " .. s.ipaddr .. " " .. s.port) == 0 then
+	--       if  luci.sys.call("nc -z " .. s.ipaddr .. " " .. s.port) == 0 then
+	   if admin_vars then
 	       table.insert(apps,s)
-   end end end)
+	   else
+	       if s.approved and s.approved == '1' then
+	           table.insert(apps,s)
+	       end
+	   end
+   end end)
    
 for _, r in pairs(apps) do
-	if r.type then
+   if r.type then
 	  	 for _, t in pairs(r.type) do
 		  	if categories[t] then
                 appName = r.name
 				categories[t][appName] = r
-			else
+		else
 		  	    categories[t] = {}
 				appName = r.name
 				categories[t][appName] = r
 			end
-		 end
-	else appName = r.name
+		end
+	 else appName = r.name
 	 	  if categories['misc'] then
 		  	 categories['misc'][appName] = r
 		  else
 			categories['misc'] = {}
-			categories['misc'][appName] = r
+				categories['misc'][appName] = r
 		  end
 	 end
 end
-	 luci.template.render("commotion/apps_view", {categories=categories})
+	 luci.template.render("commotion/apps_view", {categories=categories, admin_vars=admin_vars})
 end
 
 
